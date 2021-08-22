@@ -11,8 +11,7 @@ type Link_shortening struct {
 
 func (r *Link_shortening) Create(l *models.URL) (*models.URL, error) {
 	CreateQuery := "INSERT INTO URLs (longURL, shortURL) values ($1, $2) RETURNING id;"
-	if err := r.postgres.db.QueryRow(context.Background(), CreateQuery, l.LongURL, l.ShortURL,).Scan(&l.Id); 
-		err != nil {
+	if err := r.postgres.db.QueryRow(context.Background(), CreateQuery, l.LongURL, l.ShortURL).Scan(&l.Id); err != nil {
 		return nil, err
 	}
 	return l, nil

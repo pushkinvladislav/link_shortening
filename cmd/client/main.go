@@ -15,25 +15,24 @@ func main() {
 	logger.InitLogger()
 	logger.Logger.Info("Starting client...")
 
+	args := os.Args
+	conn, err := grpc.Dial("8080", grpc.WithInsecure())
 
-    args := os.Args
-    conn, err := grpc.Dial("8080",grpc.WithInsecure())
+	if err != nil {
+		grpclog.Fatalf("fail to dial: %v", err)
+	}
 
-    if err != nil {
-        grpclog.Fatalf("fail to dial: %v", err)
-    }
-
-    defer conn.Close()
+	defer conn.Close()
 
 	client := shorter.NewShorterServiceClient(conn)
-    request := &shorter.CreateRequest{
-        LongURL: args[1],
-    }
-    response, err := client.Create(context.Background(), request)
+	request := &shorter.CreateRequest{
+		LongURL: args[1],
+	}
+	response, err := client.Create(context.Background(), request)
 
-    if err != nil {
-        grpclog.Fatalf("fail to dial: %v", err)
-    }
+	if err != nil {
+		grpclog.Fatalf("fail to dial: %v", err)
+	}
 
-   fmt.Println(response.ShortURL)
+	fmt.Println(response.ShortURL)
 }

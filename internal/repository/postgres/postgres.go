@@ -1,19 +1,17 @@
 package postgres
 
 import (
-	"fmt"
 	"context"
-	"github.com/pushkinvladislav/link_shortening/utils"
+	"fmt"
 	"github.com/jackc/pgx/v4"
+	"github.com/pushkinvladislav/link_shortening/utils"
 )
 
 type Postgres struct {
-	db             *pgx.Conn
+	db                 *pgx.Conn
 	linkshorteningPSQL *Link_shortening
-	
-	
 }
-type PSQlconfig struct{
+type PSQlconfig struct {
 	Host     string
 	Port     string
 	Username string
@@ -22,11 +20,10 @@ type PSQlconfig struct{
 	SSLMode  string
 }
 
-
 func (s *Postgres) EstablishPSQLConnection(cnf *PSQlconfig) (*pgx.Conn, error) {
 
 	db, err := pgx.Connect(context.Background(), fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
-	cnf.Username, cnf.Password, cnf.Host, cnf.Port, cnf.DBName))
+		cnf.Username, cnf.Password, cnf.Host, cnf.Port, cnf.DBName))
 	if err != nil {
 		logger.Logger.Error(err)
 	}

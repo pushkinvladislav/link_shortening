@@ -18,7 +18,7 @@ func (s *GRPCServer) Create(ctx context.Context, req *shorter.CreateRequest) (*s
 	config.Init()
 	database := postgres.NewPostgres()
 
- 	_, err := database.EstablishPSQLConnection(&postgres.PSQlconfig{
+	_, err := database.EstablishPSQLConnection(&postgres.PSQlconfig{
 		Host:     viper.GetString("db.postgres.host"),
 		Port:     viper.GetString("db.postgres.port"),
 		Password: viper.GetString("db.postgres.password"),
@@ -31,23 +31,22 @@ func (s *GRPCServer) Create(ctx context.Context, req *shorter.CreateRequest) (*s
 		logger.Logger.Error(err)
 	}
 
-
 	defer database.Close()
 
 	shortURL, err := gonanoid.Generate("_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", 10)
-		if err != nil {
-			logger.Logger.Error("Failed to generate",err)
-		}
-		URL := models.URL{
-			LongURL:  req.GetLongURL(),
-			ShortURL: string(shortURL),
-		}
-	
-		_, err1 := database.Link_shortening().Create(&URL)
-		if err1 != nil {
-			logger.Logger.Error("Failed to added URL:",err1)
-			return nil, err1
-		}
+	if err != nil {
+		logger.Logger.Error("Failed to generate", err)
+	}
+	URL := models.URL{
+		LongURL:  req.GetLongURL(),
+		ShortURL: string(shortURL),
+	}
+
+	_, err1 := database.Link_shortening().Create(&URL)
+	if err1 != nil {
+		logger.Logger.Error("Failed to added URL:", err1)
+		return nil, err1
+	}
 	shortURL = "https://localhost:8080/" + shortURL
 	return &shorter.CreateResponse{ShortURL: shortURL}, nil
 }
@@ -57,7 +56,7 @@ func (s *GRPCServer) Get(ctx context.Context, req *shorter.GetRequest) (*shorter
 	config.Init()
 	database := postgres.NewPostgres()
 
- 	_, err := database.EstablishPSQLConnection(&postgres.PSQlconfig{
+	_, err := database.EstablishPSQLConnection(&postgres.PSQlconfig{
 		Host:     viper.GetString("db.postgres.host"),
 		Port:     viper.GetString("db.postgres.port"),
 		Password: viper.GetString("db.postgres.password"),
@@ -76,7 +75,7 @@ func (s *GRPCServer) Get(ctx context.Context, req *shorter.GetRequest) (*shorter
 
 	_, err1 := database.Link_shortening().Get(&URL)
 	if err1 != nil {
-		logger.Logger.Error("Failed to added URL:",err1)
+		logger.Logger.Error("Failed to added URL:", err1)
 		return nil, err1
 	}
 	defer database.Close()
