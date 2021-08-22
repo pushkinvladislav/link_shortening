@@ -1,0 +1,17 @@
+db:
+  postgres:
+    host: "link_shortening-db"
+    port: "5432"
+    password: "12345678"
+    database: "link_shortening"
+    user: "link_shorter"
+    sslmode: "disable"
+
+link_shortening:
+  server:
+    port: ":8080"
+    protocol: "tcp"
+
+  client: 
+
+

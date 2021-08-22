@@ -3,8 +3,8 @@ syntax = "proto3";
 package shorter;
 
 service shorterService {
-    rpc Create (createRequest) returns (createResponse) {}
-    rpc Get (getRequest) returns (getResponse) {}
+    rpc Create(createRequest) returns (createResponse) {}
+    rpc Get(getRequest) returns (getResponse) {}
 }
 
 message createRequest {
