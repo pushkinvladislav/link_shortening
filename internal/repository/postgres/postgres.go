@@ -1,13 +1,19 @@
 package postgres
 
 import (
-	"database/sql"
 	"fmt"
+	"context"
 	"github.com/pushkinvladislav/link_shortening/utils"
-	_ "github.com/lib/pq"
+	"github.com/jackc/pgx/v4"
 )
 
-type PSQLConfig struct {
+type Postgres struct {
+	db             *pgx.Conn
+	linkshorteningPSQL *Link_shortening
+	
+	
+}
+type PSQlconfig struct{
 	Host     string
 	Port     string
 	Username string
@@ -16,20 +22,36 @@ type PSQLConfig struct {
 	SSLMode  string
 }
 
-const driverName = "postgres"
 
-func EstablishPSQLConnection(cnf *PSQLConfig) (*sql.DB, error) {
-	db, err := sql.Open(driverName, fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
-		cnf.Host, cnf.Port, cnf.Username, cnf.DBName, cnf.Password, cnf.SSLMode))
+func (s *Postgres) EstablishPSQLConnection(cnf *PSQlconfig) (*pgx.Conn, error) {
+
+	db, err := pgx.Connect(context.Background(), fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
+	cnf.Username, cnf.Password, cnf.Host, cnf.Port, cnf.DBName))
 	if err != nil {
-		return nil, err
+		logger.Logger.Error(err)
+	}
+	s.db = db
+
+	return s.db, nil
+}
+
+func (s *Postgres) Close() {
+	s.db.Close(context.Background())
+}
+
+func (s *Postgres) Link_shortening() *Link_shortening {
+	if s.linkshorteningPSQL != nil {
+		return s.linkshorteningPSQL
 	}
 
-	err = db.Ping()
-	if err != nil {
-		return nil, err
+	s.linkshorteningPSQL = &Link_shortening{
+		postgres: s,
 	}
-	logger.Logger.Info(fmt.Sprintf("Connected to db: %s", cnf.DBName))
 
-	return db, nil
+	return s.linkshorteningPSQL
+
+}
+
+func NewPostgres() *Postgres {
+	return &Postgres{}
 }

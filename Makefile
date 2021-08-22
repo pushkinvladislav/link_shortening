@@ -25,11 +25,11 @@ build-docker:
 	docker build -t client${IMAGE_POSTFIX} -f ${DOCKER_PATH}/client.Dockerfile.dev .
 	docker build -t server${IMAGE_POSTFIX} -f ${DOCKER_PATH}/server.Dockerfile.dev .
 
-app-setup-and-up: build-docker app-up db-migrate-up
+app-setup-and-up: build-docker app-up db-migrate-up 
 
 app-up: build
-	docker-compose up
-
+	docker-compose up -d
+	
 all: app-setup-and-up
 
 db-bash:
