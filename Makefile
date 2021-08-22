@@ -25,38 +25,36 @@ build-docker:
 	docker build -t client${IMAGE_POSTFIX} -f ${DOCKER_PATH}/client.Dockerfile.dev .
 	docker build -t server${IMAGE_POSTFIX} -f ${DOCKER_PATH}/server.Dockerfile.dev .
 
-app-setup-and-up: build-docker app-up
+app-setup-and-up: build-docker app-up db-migrate-up
 
 app-up: build
 	docker-compose up
 
 all: app-setup-and-up
 
+db-bash:
+	docker-compose run --rm --no-deps --name link_shortening-db db ash
+
 goose-init:
-	go build -o .bin/goose cmd/${MIGRATION_TOOL}/main.go
+	GOOS=linux GOARCH=arm go build -o .bin/goose cmd/${MIGRATION_TOOL}/main.go
 	chmod ugo+x .bin/${MIGRATION_TOOL}
 
 db-up:
-	docker-compose run --rm --no-deps --name communication-db db ash
+	docker-compose run --rm --no-deps --name link_shortening-db db ash
 
 db-migration-create: goose-init
-	if [ -z ${lang} ] ; \
-	then \
-		goose -dir=${MIGRATIONS_DIR} create ${name} sql ; \
-	else \
-	  	goose -dir=${MIGRATIONS_DIR} create ${name} ${lang} ; \
-	fi ;
+		goose -dir=${MIGRATIONS_DIR} create ${name} sql
 
 db-migrate-status: goose-init
-	docker-compose run --rm communication .bin/goose -dir ${MIGRATIONS_DIR} postgres \
+	docker-compose run --rm server .bin/goose -dir ${MIGRATIONS_DIR} postgres \
 		"user=${POSTGRES_USER} host=${POSTGRES_HOST} port=${POSTGRES_PORT} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DB} sslmode=${POSTGRES_SSL}" status
 
 db-migrate-up: goose-init
-	docker-compose run --rm communication .bin/goose -dir ${MIGRATIONS_DIR} postgres \
+	docker-compose run --rm server .bin/goose -dir ${MIGRATIONS_DIR} postgres \
         "user=${POSTGRES_USER} host=${POSTGRES_HOST} port=${POSTGRES_PORT} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DB} sslmode=${POSTGRES_SSL}" up
 
 db-migrate-down: goose-init
-	docker-compose run --rm communication .bin/goose -dir ${MIGRATIONS_DIR} postgres \
+	docker-compose run --rm server .bin/goose -dir ${MIGRATIONS_DIR} postgres \
         "user=${POSTGRES_USER} host=${POSTGRES_HOST} port=${POSTGRES_PORT} password=${POSTGRES_PASSWORD} dbname=${POSTGRES_DB} sslmode=${POSTGRES_SSL}" down
 
 test:

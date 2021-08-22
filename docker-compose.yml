@@ -27,7 +27,7 @@ services:
   db:
     restart: always
     image: postgres:latest
-    container_name: database
+    container_name: link_shortening-db
     volumes:
       - ./database:/var/lib/postgresql
     environment:
@@ -36,4 +36,6 @@ services:
       - POSTGRES_DB=${POSTGRES_DB}
     ports:
       - 5436:5432
+    healthcheck:
+      test: "exit 0"      
     

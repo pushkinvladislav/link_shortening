@@ -30,7 +30,7 @@ func main() {
 		SSLMode:  viper.GetString("db.postgres.sslmode"),
 	})
 	if err != nil {
-		logger.Logger.Error(err.Error())
+		logger.Logger.Error(err)
 	}
 
 	defer func() {
@@ -48,7 +48,7 @@ func main() {
 	if err != nil {
 		logger.Logger.Error(err)
 	} else {
-		logger.Logger.Info("Server listening on :8081")
+		logger.Logger.Info("Server listening on :8080")
 	}
 
 	if err := s.Serve(l); err != nil {
