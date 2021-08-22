@@ -1,0 +1,9 @@
+FROM golang:latest
+
+WORKDIR /link_shortening
+
+ENV PROJ_ROOT=/link_shortening
+
+COPY . .
+
+RUN make build
