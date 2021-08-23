@@ -1,0 +1,7 @@
+FROM dep AS builder
+
+WORKDIR /link_shortening
+
+RUN chmod ugo+x .bin/client
+
+CMD .bin/client

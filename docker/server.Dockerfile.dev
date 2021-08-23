@@ -1,0 +1,9 @@
+FROM dep AS builder
+
+WORKDIR /link_shortening
+
+RUN chmod ugo+x .bin/server
+
+CMD .bin/server
+
+EXPOSE 8084
