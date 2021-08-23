@@ -75,7 +75,7 @@ func (s *GRPCServer) Get(ctx context.Context, req *shorter.GetRequest) (*shorter
 
 	_, err1 := database.Link_shortening().Get(&URL)
 	if err1 != nil {
-		logger.Logger.Error("Failed to added URL:", err1)
+		logger.Logger.Error("Failed to get URL:", err1)
 		return nil, err1
 	}
 	defer database.Close()

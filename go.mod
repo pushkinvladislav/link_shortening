@@ -4,11 +4,13 @@ go 1.16
 
 require (
 	github.com/armon/consul-api v0.0.0-20180202201655-eb2c6b5be1b6 // indirect
+	github.com/buger/goterm v1.0.1
 	github.com/coreos/go-etcd v2.0.0+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.5.0 // indirect
 	github.com/golang/glog v1.0.0 // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/gopherjs/gopherjs v0.0.0-20210822113901-9ebd50d28389 // indirect
+	github.com/inancgumus/screen v0.0.0-20190314163918-06e984b86ed3
 	github.com/jackc/pgx/v4 v4.13.0 // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/lib/pq v1.10.2
