@@ -22,6 +22,7 @@ func main() {
 	defer conn.Close()
 
 	client := shorter.NewShorterServiceClient(conn)
+
 	var comand string
 	var url string
 
@@ -33,6 +34,7 @@ func main() {
 		fmt.Print("Вернуть longURl:  Get\n")
 		fmt.Print("Выход:            exit\n")
 		fmt.Scanf("%v/$v\n", &comand, &url)
+
 		switch comand {
 		case "Create":
 			screen.Clear()
@@ -60,7 +62,7 @@ func main() {
 			if url != "" {
 				res, err := client.Get(context.Background(), &shorter.GetRequest{ShortURL: url})
 				if err != nil {
-					fmt.Printf("Короткая ссылка для этого URL не создавалась\n")
+					logger.Logger.Error(err)
 				}
 				if res.LongURL == "" {
 					fmt.Printf("Короткая ссылка для этого URL не создавалась\n")
