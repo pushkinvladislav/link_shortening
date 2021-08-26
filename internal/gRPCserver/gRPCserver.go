@@ -37,7 +37,6 @@ func generate() (string, error) {
 
 func (s *GRPCServer) Create(ctx context.Context, req *shorter.CreateRequest) (*shorter.CreateResponse, error) {
 
-	config.Init()
 	database := postgres.NewPostgres()
 	config := initPSQLconfig()
 	_, err := database.EstablishPSQLConnection(config)
@@ -100,16 +99,10 @@ func (s *GRPCServer) Create(ctx context.Context, req *shorter.CreateRequest) (*s
 
 func (s *GRPCServer) Get(ctx context.Context, req *shorter.GetRequest) (*shorter.GetResponse, error) {
 
-	config.Init()
+	config := initPSQLconfig()
 	database := postgres.NewPostgres()
 
-	_, err := database.EstablishPSQLConnection(&postgres.PSQlconfig{
-		Host:     viper.GetString("db.postgres.host"),
-		Port:     viper.GetString("db.postgres.port"),
-		Password: viper.GetString("db.postgres.password"),
-		DBName:   viper.GetString("db.postgres.database"),
-		Username: viper.GetString("db.postgres.user"),
-	})
+	_, err := database.EstablishPSQLConnection(config)
 
 	if err != nil {
 		logger.Logger.Error(err)
