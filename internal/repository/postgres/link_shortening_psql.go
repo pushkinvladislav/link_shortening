@@ -39,3 +39,14 @@ func (r *Link_shortening) FindLongURL(l *models.URL) (*models.URL, error) {
 	return l, nil
 
 }
+
+func (r *Link_shortening) FindShortURL(shortURL string) (string, error) {
+
+	FindLongURLQuery := "SELECT longURL from URLs WHERE shortURL=$1"
+	var findShortURL string
+	if err := r.postgres.db.QueryRow(context.Background(), FindLongURLQuery, shortURL).Scan(&findShortURL); err != nil {
+		return findShortURL, err
+	}
+	return findShortURL, nil
+
+}

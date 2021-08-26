@@ -14,19 +14,33 @@ import (
 
 type GRPCServer struct{}
 
-func (s *GRPCServer) Create(ctx context.Context, req *shorter.CreateRequest) (*shorter.CreateResponse, error) {
-
+func initPSQLconfig() *postgres.PSQlconfig {
 	config.Init()
-	database := postgres.NewPostgres()
-
-	_, err := database.EstablishPSQLConnection(&postgres.PSQlconfig{
+	config := &postgres.PSQlconfig{
 		Host:     viper.GetString("db.postgres.host"),
 		Port:     viper.GetString("db.postgres.port"),
 		Password: viper.GetString("db.postgres.password"),
 		DBName:   viper.GetString("db.postgres.database"),
 		Username: viper.GetString("db.postgres.user"),
 		SSLMode:  viper.GetString("db.postgres.sslmode"),
-	})
+	}
+	return config
+}
+
+func generate() (string, error) {
+	shortURL, err := gonanoid.Generate("_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", 10)
+	if err != nil {
+		return shortURL, err
+	}
+	return shortURL, nil
+}
+
+func (s *GRPCServer) Create(ctx context.Context, req *shorter.CreateRequest) (*shorter.CreateResponse, error) {
+
+	config.Init()
+	database := postgres.NewPostgres()
+	config := initPSQLconfig()
+	_, err := database.EstablishPSQLConnection(config)
 
 	if err != nil {
 		logger.Logger.Error(err)
@@ -38,18 +52,42 @@ func (s *GRPCServer) Create(ctx context.Context, req *shorter.CreateRequest) (*s
 		LongURL:  req.GetLongURL(),
 		ShortURL: "",
 	}
-	database.Link_shortening().FindLongURL(&URL)
+	_, err = database.Link_shortening().FindLongURL(&URL)
+	if err != nil {
+		logger.Logger.Error(err)
+	}
 
 	var shortURL string
 
 	if URL.ShortURL == "" {
-		shortURL, err = gonanoid.Generate("_0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ", 10)
+
+		shortURL, err = generate()
 		if err != nil {
-			logger.Logger.Error("Failed to generate", err)
+			logger.Logger.Error(err)
 		}
+
+		findShortURL, err := database.Link_shortening().FindShortURL(shortURL)
+		if err != nil {
+			logger.Logger.Error(err)
+		}
+
+		for findShortURL != "" {
+
+			shortURL, err = generate()
+			if err != nil {
+				logger.Logger.Error()
+			}
+
+			findShortURL, err = database.Link_shortening().FindShortURL(shortURL)
+			if err != nil {
+				logger.Logger.Error(err)
+			}
+
+		}
+
 		URL.ShortURL = shortURL
 
-		_, err := database.Link_shortening().Create(&URL)
+		_, err = database.Link_shortening().Create(&URL)
 		if err != nil {
 			logger.Logger.Error("Failed to added URL:", err)
 			return nil, err
